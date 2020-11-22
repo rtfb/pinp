@@ -1,7 +1,22 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/rtfb/pinp/lexer"
+	"github.com/rtfb/pinp/token"
+)
+
+var prog = `program foo;
+begin
+	WriteLn('hello');
+end;`
 
 func main() {
-	fmt.Println("vim-go")
+	l := lexer.New(prog)
+	tok := l.NextToken()
+	for tok.Type != token.EOF {
+		fmt.Println(tok)
+		tok = l.NextToken()
+	}
 }

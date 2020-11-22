@@ -1,0 +1,18 @@
+program func;
+
+function foo(param: int64): int64   // explicit types
+begin
+    return param + 2;   // an explicit return statement
+end;
+
+// no separate construct for procedures like in Pascal, just don't return from
+// a func.
+
+begin
+    WriteLn(foo(5));
+
+    // lambdas:
+    doubler = function(x: int64): int64 begin
+        return x*2;
+    end;
+end;

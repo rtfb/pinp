@@ -1,0 +1,29 @@
+program flow_contorl;
+
+begin
+    if something then // 'then' is also a 'begin', no need to stutter
+        foo();
+        bar();
+    end;
+
+
+    var x: int64 = 7; /* variables are declared at any point, not only in a
+                         specialized blocks. Also, a single '=' is used in
+                         assignment, no need for the didactic differentiation
+                         between ':=' and '='.
+                      */
+    if x % 2 == 1 then
+        WriteLn('Odd');  // variables, functions and keywords are case-sendistive
+    else                 // 'else' is also the 'end' of the 'then', and a
+                         // 'begin' for itself
+        WriteLn('Even');
+    end;
+
+
+    // while loop will be the only loop construct:
+    var i: int64 = 0;
+    while i < 10 do // 'do' is a 'begin'
+        WriteLn(i);
+        i = i + 1;
+    end;
+end;

@@ -1,0 +1,5 @@
+program first; // C-style comments
+
+begin
+    WriteLn('Hello there');
+end; // semicolon everywhere

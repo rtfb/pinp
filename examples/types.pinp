@@ -1,0 +1,15 @@
+program types;
+
+begin
+    var i: int64 = 7;
+    var f: float64 = 2.3;
+    var s: string = 'labą dieną'; // utf-8
+    var arr: array[int64] = {2, 4, 6, 8};
+    var hash: map[string:int64] = {
+        'foo': 7,
+        'bar': 9,  // mandatory trailing comma
+    };
+
+
+    WriteLn(arr[0], arr[2]);  // => 2, 6, i.e. array indexing is zero-based
+end;

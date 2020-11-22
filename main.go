@@ -13,7 +13,8 @@ begin
 end;`
 
 func main() {
-	l := lexer.New(prog)
+	f := lexer.NewFileFromString(prog)
+	l := lexer.New(f)
 	tok := l.NextToken()
 	for tok.Type != token.EOF {
 		fmt.Println(tok)

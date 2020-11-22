@@ -1,5 +1,7 @@
 package token
 
+import "fmt"
+
 // A set of token types.
 const (
 	Illegal = "ILLEGAL"
@@ -69,6 +71,19 @@ type Type string
 type Token struct {
 	Type    Type
 	Literal string
+	Pos     Position
+}
+
+// Position holds the location of the token in the source file.
+type Position struct {
+	File string
+	Line int
+	Col  int
+	Pos  int
+}
+
+func (p Position) String() string {
+	return fmt.Sprintf("%s:%d:%d", p.File, p.Line, p.Col)
 }
 
 // LookupIdent returns an appropriate token type for identifier: if it's a

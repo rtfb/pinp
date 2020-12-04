@@ -12,7 +12,7 @@ begin
 	WriteLn('hello');
 end;`
 
-// TODO: this valid no-op program causes errors and a crash:
+// TODO: this valid no-op program causes errors:
 // var prog = `program foo;
 // begin
 // end;`

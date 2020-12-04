@@ -129,9 +129,17 @@ func (p *Parser) Errors() []string {
 func (p *Parser) parseTopLevelStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.Var:
-		return p.parseVarStatement()
+		v := p.parseVarStatement()
+		if v == nil {
+			return nil
+		}
+		return v
 	case token.Begin:
-		return p.parseProgramBody()
+		body := p.parseProgramBody()
+		if body == nil {
+			return nil
+		}
+		return body
 	// case token.Function:
 	// 	return p.parseFuncDefStatement()
 	// case token.Import:
@@ -145,9 +153,17 @@ func (p *Parser) parseTopLevelStatement() ast.Statement {
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.Var:
-		return p.parseVarStatement()
+		v := p.parseVarStatement()
+		if v == nil {
+			return nil
+		}
+		return v
 	case token.Return:
-		return p.parseReturnStatement()
+		r := p.parseReturnStatement()
+		if r == nil {
+			return nil
+		}
+		return r
 	// case token.If:
 	// return p.parseIfStatement()
 	// case token.While:
@@ -160,9 +176,9 @@ func (p *Parser) parseStatement() ast.Statement {
 func (p *Parser) parseProgramBody() *ast.BlockStatement {
 	p.nextToken() // eat the 'begin' token that brought us here
 	block := ast.BlockStatement{
-		Token: p.curToken,
+		Token:      p.curToken,
+		Statements: []ast.Statement{},
 	}
-	block.Statements = []ast.Statement{}
 	p.nextToken()
 	for !p.curTokenIs(token.End) && !p.curTokenIs(token.EOF) {
 		stmt := p.parseStatement()

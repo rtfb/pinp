@@ -37,6 +37,7 @@ const (
 	Colon     = ":"
 
 	// Keywords
+	Program  = "PROGRAM"
 	Function = "FUNCTION"
 	Var      = "VAR"
 	True     = "TRUE"
@@ -48,9 +49,11 @@ const (
 	End      = "END"
 	Do       = "DO"
 	While    = "WHILE"
+	Import   = "IMPORT"
 )
 
 var keywords = map[string]Type{
+	"program":  Program,
 	"function": Function,
 	"var":      Var,
 	"true":     True,

@@ -86,8 +86,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.GT, p.parseInfixExpression)
 	p.registerInfix(token.LParen, p.parseCallExpression)
 	p.registerInfix(token.LBracket, p.parseIndexExpression)
-	// read two tokens so that curToken and peekToken are both set:
-	p.nextToken()
+	// read a token to initialize the peekToken:
 	p.nextToken()
 	return &p
 }
@@ -99,11 +98,21 @@ func (p *Parser) nextToken() {
 
 // ParseProgram is the main entry point of the parser.
 func (p *Parser) ParseProgram() *ast.Program {
+	if !p.expectPeek(token.Program) {
+		return nil
+	}
+	if !p.expectPeek(token.Ident) {
+		return nil
+	}
+	if !p.expectPeek(token.Semicolon) {
+		return nil
+	}
+	p.nextToken() // swallow the semicolon
 	program := ast.Program{
 		Statements: []ast.Statement{},
 	}
 	for p.curToken.Type != token.EOF {
-		stmt := p.parseStatement()
+		stmt := p.parseTopLevelStatement()
 		if stmt != nil {
 			program.Statements = append(program.Statements, stmt)
 		}
@@ -117,13 +126,55 @@ func (p *Parser) Errors() []string {
 	return p.errors
 }
 
+func (p *Parser) parseTopLevelStatement() ast.Statement {
+	switch p.curToken.Type {
+	case token.Var:
+		return p.parseVarStatement()
+	case token.Begin:
+		return p.parseProgramBody()
+	// case token.Function:
+	// 	return p.parseFuncDefStatement()
+	// case token.Import:
+	// 	return p.parseImportStatement()
+	default:
+		p.unexpectedToken(p.curToken)
+		return nil
+	}
+}
+
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
+	case token.Var:
+		return p.parseVarStatement()
 	case token.Return:
 		return p.parseReturnStatement()
+	// case token.If:
+	// return p.parseIfStatement()
+	// case token.While:
+	// return p.parseWhileStatement()
 	default:
 		return p.parseExpressionStatement()
 	}
+}
+
+func (p *Parser) parseProgramBody() *ast.BlockStatement {
+	p.nextToken() // eat the 'begin' token that brought us here
+	block := ast.BlockStatement{
+		Token: p.curToken,
+	}
+	block.Statements = []ast.Statement{}
+	p.nextToken()
+	for !p.curTokenIs(token.End) && !p.curTokenIs(token.EOF) {
+		stmt := p.parseStatement()
+		if stmt != nil {
+			block.Statements = append(block.Statements, stmt)
+		}
+		p.nextToken()
+	}
+	if !p.expectPeek(token.Semicolon) {
+		return nil
+	}
+	return &block
 }
 
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
@@ -132,6 +183,28 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	}
 	p.nextToken()
 	stmt.ReturnValue = p.parseExpression(Lowest)
+	if p.peekTokenIs(token.Semicolon) {
+		p.nextToken()
+	}
+	return &stmt
+}
+
+func (p *Parser) parseVarStatement() *ast.VarStatement {
+	stmt := ast.VarStatement{
+		Token: p.curToken,
+	}
+	if !p.expectPeek(token.Ident) {
+		return nil
+	}
+	stmt.Name = &ast.Identifier{
+		Token: p.curToken,
+		Value: p.curToken.Literal,
+	}
+	if !p.expectPeek(token.Assign) {
+		return nil
+	}
+	p.nextToken()
+	stmt.Value = p.parseExpression(Lowest)
 	if p.peekTokenIs(token.Semicolon) {
 		p.nextToken()
 	}
@@ -429,6 +502,14 @@ func (p *Parser) peekError(t token.Type) {
 
 func (p *Parser) noPrefixParseFnError(t token.Type) {
 	msg := fmt.Sprintf("no prefix parse function for %s found", t)
+	p.errors = append(p.errors, msg)
+}
+
+func (p *Parser) unexpectedToken(t token.Token) {
+	// TODO: improve error formatting. Make it smth like Token.Errorf(fmt...),
+	// so it would automatically prepend the position. Turn the errors field
+	// into []error.
+	msg := fmt.Sprintf("%s: unexpected token %s (type %s)", t.Pos.String(), t.Literal, t.Type)
 	p.errors = append(p.errors, msg)
 }
 

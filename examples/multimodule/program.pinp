@@ -1,0 +1,10 @@
+program foo;
+
+import math;  // At least one of *.pinp in the same dir must contain 'module math'.
+              // Can be renamed with 'import math as trig'.
+              // Can import from subdirs with 'import foo/bar/baz' (imports
+              // 'baz.pinp' from ./foo/bar/ OR from $stdlib/foo/bar/)
+
+begin
+    WriteLn(math.pi);
+end;

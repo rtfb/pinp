@@ -1,0 +1,18 @@
+program kwargs;
+
+function foo(param: int64, name: string, verbose: bool): int64
+begin
+    if verbose then
+        WriteLn(name);
+    end;
+    return param + 2;
+end;
+
+begin
+    WriteLn(foo(5, 'name', verbose=true)); // any param can be passed as kwarg for readability
+
+    // including in lambdas:
+    function(x: int64, init: int64): int64 begin
+        return init + x * 2;
+    end(init=10);
+end;
